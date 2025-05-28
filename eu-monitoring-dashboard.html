@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU Intelligence Dashboard - Swiss Mission Brussels</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+            gap: 0;
+        }
+
+        .sidebar {
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
+            padding: 2rem 1.5rem;
+            box-shadow: none;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #0f172a;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #f1f5f9;
+            color: #0f172a;
+            transform: none;
+        }
+
+        .nav-item.active {
+            background: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: #ffffff;
+            padding: 1.5rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .alert-status {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-high { background: #ef4444; color: white; }
+        .status-medium { background: #f59e0b; color: white; }
+        .status-low { background: #3b82f6; color: white; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.7;
+        }
+
+        .metric {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .timeline {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            min-width: 60px;
+            font-weight: 500;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-desc {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .priority-high { border-left: 4px solid #e74c3c; }
+        .priority-medium { border-left: 4px solid #f39c12; }
+        .priority-low { border-left: 4px solid #3498db; }
+
+        .live-feed {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            margin-top: 2rem;
+        }
+
+        .feed-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            background: #f8fafc;
+            transition: background-color 0.2s ease;
+        }
+
+        .feed-item:hover {
+            background: #f1f5f9;
+            transform: none;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .network-map {
+            height: 300px;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-style: italic;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .node {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .node:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
+        .node:nth-child(2) { top: 60%; left: 70%; animation-delay: 1s; }
+        .node:nth-child(3) { top: 40%; left: 50%; animation-delay: 2s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: #2563eb;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .classified-banner {
+            background: #dc2626;
+            color: white;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="classified-banner">
+        🇨🇭 SWISS CONFEDERATION - DIPLOMATIC MISSION BRUSSELS - RESTRICTED ACCESS
+    </div>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="logo">
+                🇨🇭 EU Intel Hub
+            </div>
+            
+            <div class="nav-item active">
+                📊 Overview
+            </div>
+            <div class="nav-item">
+                🎯 Priority Alerts
+            </div>
+            <div class="nav-item">
+                📋 Council Tracker
+            </div>
+            <div class="nav-item">
+                🤝 Bilateral Monitor
+            </div>
+            <div class="nav-item">
+                🔒 JHA Intelligence
+            </div>
+            <div class="nav-item">
+                🌐 Network Analysis
+            </div>
+            <div class="nav-item">
+                📱 Real-time Feeds
+            </div>
+            <div class="nav-item">
+                📈 Predictive Analytics
+            </div>
+            <div class="nav-item">
+                ⚙️ System Config
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div>
+                    <h1>EU Intelligence Dashboard</h1>
+                    <p style="color: #7f8c8d; margin-top: 0.5rem;">Live monitoring of 847 EU sources • Last update: 2 minutes ago</p>
+                </div>
+                <div class="alert-status">
+                    <div class="status-badge status-high">3 High Priority</div>
+                    <div class="status-badge status-medium">12 Medium</div>
+                    <div class="status-badge status-low">28 Monitoring</div>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Swiss Mentions Today</div>
+                        <div class="card-icon">🎯</div>
+                    </div>
+                    <div class="metric">47</div>
+                    <div class="metric-label">↑ 23% from yesterday</div>
+                    <div class="chart-placeholder">Trend Analysis Chart</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Council WGs</div>
+                        <div class="card-icon">🏛️</div>
+                    </div>
+                    <div class="metric">12</div>
+                    <div class="metric-label">Meeting this week</div>
+                    <div style="margin-top: 1rem;">
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🔴 COSI (Tomorrow 14:00)</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🟡 SCIFA (Wednesday)</div>
+                        <div style="font-size: 0.9rem;">🟢 LEWP (Friday)</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Bilateral Tracking</div>
+                        <div class="card-icon">🤝</div>
+                    </div>
+                    <div class="metric">8</div>
+                    <div class="metric-label">Active negotiations</div>
+                    <div style="margin-top: 1rem;">
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🔥 Institutional Framework</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">⚡ Stock Exchange Equivalence</div>
+                        <div style="font-size: 0.9rem;">📊 Horizon Europe Plus</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Network Influence Map</div>
+                        <div class="card-icon">🌐</div>
+                    </div>
+                    <div class="network-map">
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div class="node"></div>
+                        <div style="text-align: center;">
+                            Interactive stakeholder network<br>
+                            <small>Key players • Influence paths • Decision trees</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <div class="card" style="grid-column: 1 / -1;">
+                    <div class="card-header">
+                        <div class="card-title">🚨 Priority Intelligence Feed</div>
+                        <div style="font-size: 0.8rem; color: #7f8c8d;">Real-time • AI-filtered • Threat assessment</div>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item priority-high">
+                            <div class="timeline-time">14:23</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">🔴 BREAKING: Council Legal Service opinion on CH-EU framework</div>
+                                <div class="timeline-desc">Confidential legal assessment leaked - suggests major hurdles for institutional framework. Source: COREPER I insider</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item priority-high">
+                            <div class="timeline-time">13:45</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">🔴 URGENT: COSI emergency session called</div>
+                                <div class="timeline-desc">Migration pact implementation crisis - Switzerland's Schengen status may be discussed. Meeting tomorrow 08:00</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item priority-medium">
+                            <div class="timeline-time">12:30</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">🟡 DG FISMA preparing equivalence review</div>
+                                <div class="timeline-desc">Swiss financial services equivalence under scrutiny. Internal memo suggests stricter requirements</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item priority-medium">
+                            <div class="timeline-time">11:15</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">🟡 Parliament INTA committee: Swiss trade discussion</div>
+                                <div class="timeline-desc">MEP Lange raised questions about Swiss compliance with state aid rules. Hearing scheduled next week</div>
+                            </div>
+                        </div>
+                        <div class="timeline-item priority-low">
+                            <div class="timeline-time">10:00</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">🔵 Commission Daily News: Research cooperation</div>
+                                <div class="timeline-desc">Positive mention of Swiss participation in Horizon Europe projects. Standard update</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="live-feed">
+                <div class="card-header">
+                    <div class="card-title">🔴 Live Intelligence Stream</div>
+                    <div style="font-size: 0.8rem; color: #7f8c8d;">AI-powered • Multi-source fusion • 24/7 monitoring</div>
+                </div>
+                
+                <div class="feed-item">
+                    <div class="pulse"></div>
+                    <div>
+                        <strong>SIGINT:</strong> Encrypted communication spike between COM and Council Legal Service
+                    </div>
+                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">Just now</div>
+                </div>
+                
+                <div class="feed-item">
+                    <div class="pulse"></div>
+                    <div>
+                        <strong>OSINT:</strong> German MEP Weber tweeted about "third country partnerships"
+                    </div>
+                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">2 min ago</div>
+                </div>
+                
+                <div class="feed-item">
+                    <div class="pulse"></div>
+                    <div>
+                        <strong>HUMINT:</strong> French Permanent Representation source confirms bilateral meeting tomorrow
+                    </div>
+                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">5 min ago</div>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="action-btn">🚀 Generate Flash Report</button>
+                    <button class="action-btn">📞 Alert Bern</button>
+                    <button class="action-btn">📧 Brief Ambassador</button>
+                    <button class="action-btn">🔍 Deep Analysis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate real-time updates
+            setInterval(function() {
+                const pulses = document.querySelectorAll('.pulse');
+                pulses.forEach(pulse => {
+                    pulse.style.animation = 'none';
+                    setTimeout(() => {
+                        pulse.style.animation = 'pulse 2s infinite';
+                    }, 10);
+                });
+            }, 3000);
+
+            // Add click handlers
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Simulate metric updates
+            setInterval(function() {
+                const metrics = document.querySelectorAll('.metric');
+                metrics.forEach(metric => {
+                    if (Math.random() > 0.8) {
+                        const currentValue = parseInt(metric.textContent);
+                        const change = Math.floor(Math.random() * 3) - 1;
+                        metric.textContent = Math.max(0, currentValue + change);
+                    }
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
