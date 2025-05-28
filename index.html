@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EU Intelligence Dashboard - Swiss Mission Brussels</title>
+    <title>Swiss EU Security Monitoring Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -12,538 +12,846 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f8fafc;
-            min-height: 100vh;
-            color: #1e293b;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-            gap: 0;
-        }
-
-        .sidebar {
-            background: #ffffff;
-            border-right: 1px solid #e2e8f0;
-            padding: 2rem 1.5rem;
-            box-shadow: none;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            font-weight: 600;
-            font-size: 1.1rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
             color: #0f172a;
+            line-height: 1.6;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: #1e293b;
+            color: white;
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.875rem;
+            color: #94a3b8;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.25rem;
-            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
             cursor: pointer;
-            transition: all 0.2s ease;
-            color: #64748b;
-            font-weight: 500;
         }
 
-        .nav-item:hover, .nav-item.active {
-            background: #f1f5f9;
-            color: #0f172a;
-            transform: none;
+        .nav-item:hover {
+            background-color: #334155;
+            color: white;
         }
 
         .nav-item.active {
-            background: #e2e8f0;
-            font-weight: 600;
+            background-color: #3b82f6;
+            color: white;
         }
 
+        .nav-item span {
+            margin-right: 0.75rem;
+        }
+
+        /* Main Content */
         .main-content {
+            flex: 1;
+            margin-left: 260px;
             padding: 2rem;
-            overflow-y: auto;
         }
 
+        /* Header */
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: #ffffff;
+            background-color: white;
             padding: 1.5rem 2rem;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .header h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .alert-status {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .status-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-high { background: #ef4444; color: white; }
-        .status-medium { background: #f59e0b; color: white; }
-        .status-low { background: #3b82f6; color: white; }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
             margin-bottom: 2rem;
-        }
-
-        .card {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-            transition: box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: none;
-        }
-
-        .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
         }
 
-        .card-title {
-            font-size: 1rem;
+        .header h2 {
+            font-size: 1.5rem;
             font-weight: 600;
-            color: #374151;
         }
 
-        .card-icon {
-            width: 24px;
-            height: 24px;
-            opacity: 0.7;
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .metric {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 0.5rem;
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .metric-label {
-            color: #64748b;
             font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
         }
 
-        .timeline {
-            max-height: 400px;
-            overflow-y: auto;
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
         }
 
-        .timeline-item {
+        .metric-change {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .metric-change.positive {
+            color: #10b981;
+        }
+
+        .metric-change.negative {
+            color: #ef4444;
+        }
+
+        /* Priority Timeline */
+        .timeline-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .timeline-header {
             display: flex;
-            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
+        }
+
+        .timeline-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background-color: white;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            background-color: #f1f5f9;
+        }
+
+        .filter-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            border-left: 3px solid #e2e8f0;
+            padding-left: 1.5rem;
+            margin-left: 0.5rem;
             padding-bottom: 1.5rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .timeline-item.high-priority {
+            border-left-color: #ef4444;
+        }
+
+        .timeline-item.medium-priority {
+            border-left-color: #f59e0b;
+        }
+
+        .timeline-item.low-priority {
+            border-left-color: #10b981;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid #e2e8f0;
+        }
+
+        .timeline-item.high-priority .timeline-dot {
+            border-color: #ef4444;
+        }
+
+        .timeline-item.medium-priority .timeline-dot {
+            border-color: #f59e0b;
+        }
+
+        .timeline-item.low-priority .timeline-dot {
+            border-color: #10b981;
         }
 
         .timeline-time {
             font-size: 0.75rem;
             color: #64748b;
-            min-width: 60px;
-            font-weight: 500;
-        }
-
-        .timeline-content {
-            flex: 1;
+            margin-bottom: 0.25rem;
         }
 
         .timeline-title {
             font-weight: 600;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
         }
 
-        .timeline-desc {
+        .timeline-description {
             font-size: 0.875rem;
-            color: #64748b;
+            color: #475569;
+            margin-bottom: 0.5rem;
         }
 
-        .priority-high { border-left: 4px solid #e74c3c; }
-        .priority-medium { border-left: 4px solid #f39c12; }
-        .priority-low { border-left: 4px solid #3498db; }
+        .timeline-keywords {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
 
-        .live-feed {
-            background: #ffffff;
-            border-radius: 8px;
+        .keyword-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #e0e7ff;
+            color: #3730a3;
+            border-radius: 0.25rem;
+        }
+
+        /* Data Table */
+        .table-section {
+            background-color: white;
             padding: 1.5rem;
+            border-radius: 0.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            padding: 0.5rem 1rem;
             border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            width: 300px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .priority-badge.high {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-badge.medium {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-badge.low {
+            background-color: #d1fae5;
+            color: #059669;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
             margin-top: 2rem;
         }
 
-        .feed-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 6px;
-            background: #f8fafc;
-            transition: background-color 0.2s ease;
-        }
-
-        .feed-item:hover {
-            background: #f1f5f9;
-            transform: none;
-        }
-
-        .pulse {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #10b981;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .chart-placeholder {
-            height: 200px;
-            background: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            font-style: italic;
-        }
-
-        .network-map {
-            height: 300px;
-            background: #f8fafc;
-            border: 1px dashed #cbd5e1;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            font-style: italic;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .node {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #3b82f6;
-            border-radius: 50%;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .node:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
-        .node:nth-child(2) { top: 60%; left: 70%; animation-delay: 1s; }
-        .node:nth-child(3) { top: 40%; left: 50%; animation-delay: 2s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .action-btn {
+        .btn {
             padding: 0.75rem 1.5rem;
-            background: #3b82f6;
-            color: white;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 0.375rem;
             font-weight: 500;
-            transition: background-color 0.2s ease;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .action-btn:hover {
-            background: #2563eb;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .classified-banner {
-            background: #dc2626;
+        .btn-primary {
+            background-color: #3b82f6;
             color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
             text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .settings-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .settings-group input,
+        .settings-group textarea {
+            width: 100%;
             padding: 0.5rem;
-            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+        }
+
+        .settings-group textarea {
+            min-height: 100px;
+            font-family: monospace;
             font-size: 0.875rem;
-            letter-spacing: 0.5px;
         }
     </style>
 </head>
 <body>
-    <div class="classified-banner">
-        🇨🇭 SWISS CONFEDERATION - DIPLOMATIC MISSION BRUSSELS - RESTRICTED ACCESS
-    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h1>EU Security Monitor</h1>
+                <p>Swiss Diplomatic Intelligence</p>
+            </div>
+            <a href="#" class="nav-item active" onclick="showSection('overview', this); return false;">
+                <span>📊</span> Overview
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('alerts', this); return false;">
+                <span>🎯</span> Priority Alerts
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('data', this); return false;">
+                <span>📋</span> All Data
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('analytics', this); return false;">
+                <span>📈</span> Analytics
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('settings', this); return false;">
+                <span>⚙️</span> Settings
+            </a>
+        </nav>
 
-    <div class="dashboard">
-        <div class="sidebar">
-            <div class="logo">
-                🇨🇭 EU Intel Hub
-            </div>
-            
-            <div class="nav-item active">
-                📊 Overview
-            </div>
-            <div class="nav-item">
-                🎯 Priority Alerts
-            </div>
-            <div class="nav-item">
-                📋 Council Tracker
-            </div>
-            <div class="nav-item">
-                🤝 Bilateral Monitor
-            </div>
-            <div class="nav-item">
-                🔒 JHA Intelligence
-            </div>
-            <div class="nav-item">
-                🌐 Network Analysis
-            </div>
-            <div class="nav-item">
-                📱 Real-time Feeds
-            </div>
-            <div class="nav-item">
-                📈 Predictive Analytics
-            </div>
-            <div class="nav-item">
-                ⚙️ System Config
-            </div>
-        </div>
-
-        <div class="main-content">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
             <div class="header">
-                <div>
-                    <h1>EU Intelligence Dashboard</h1>
-                    <p style="color: #7f8c8d; margin-top: 0.5rem;">Live monitoring of 847 EU sources • Last update: 2 minutes ago</p>
-                </div>
-                <div class="alert-status">
-                    <div class="status-badge status-high">3 High Priority</div>
-                    <div class="status-badge status-medium">12 Medium</div>
-                    <div class="status-badge status-low">28 Monitoring</div>
+                <h2 id="section-title">Overview</h2>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>System Active</span>
+                    <span id="last-update">Last update: Loading...</span>
                 </div>
             </div>
 
-            <div class="grid-container">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Swiss Mentions Today</div>
-                        <div class="card-icon">🎯</div>
+            <!-- Overview Section -->
+            <div id="overview-section" class="content-section">
+                <!-- Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Mentions Today</div>
+                        <div class="metric-value" id="total-mentions">0</div>
+                        <div class="metric-change positive">↑ 0% from yesterday</div>
                     </div>
-                    <div class="metric">47</div>
-                    <div class="metric-label">↑ 23% from yesterday</div>
-                    <div class="chart-placeholder">Trend Analysis Chart</div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Active Council WGs</div>
-                        <div class="card-icon">🏛️</div>
+                    <div class="metric-card">
+                        <div class="metric-label">High Priority Alerts</div>
+                        <div class="metric-value" id="high-priority">0</div>
+                        <div class="metric-change negative">Active alerts</div>
                     </div>
-                    <div class="metric">12</div>
-                    <div class="metric-label">Meeting this week</div>
-                    <div style="margin-top: 1rem;">
-                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🔴 COSI (Tomorrow 14:00)</div>
-                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🟡 SCIFA (Wednesday)</div>
-                        <div style="font-size: 0.9rem;">🟢 LEWP (Friday)</div>
+                    <div class="metric-card">
+                        <div class="metric-label">JHA Working Groups</div>
+                        <div class="metric-value" id="working-groups">0</div>
+                        <div class="metric-change">Mentions this week</div>
                     </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Bilateral Tracking</div>
-                        <div class="card-icon">🤝</div>
-                    </div>
-                    <div class="metric">8</div>
-                    <div class="metric-label">Active negotiations</div>
-                    <div style="margin-top: 1rem;">
-                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">🔥 Institutional Framework</div>
-                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">⚡ Stock Exchange Equivalence</div>
-                        <div style="font-size: 0.9rem;">📊 Horizon Europe Plus</div>
+                    <div class="metric-card">
+                        <div class="metric-label">System Health</div>
+                        <div class="metric-value">100%</div>
+                        <div class="metric-change positive">All sources active</div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Network Influence Map</div>
-                        <div class="card-icon">🌐</div>
-                    </div>
-                    <div class="network-map">
-                        <div class="node"></div>
-                        <div class="node"></div>
-                        <div class="node"></div>
-                        <div style="text-align: center;">
-                            Interactive stakeholder network<br>
-                            <small>Key players • Influence paths • Decision trees</small>
+                <!-- Priority Timeline -->
+                <div class="timeline-section">
+                    <div class="timeline-header">
+                        <h3>Recent Developments</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterTimeline('all')">All</button>
+                            <button class="filter-btn" onclick="filterTimeline('high')">High</button>
+                            <button class="filter-btn" onclick="filterTimeline('medium')">Medium</button>
+                            <button class="filter-btn" onclick="filterTimeline('low')">Low</button>
                         </div>
                     </div>
+                    <div id="timeline-container">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading timeline data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        📄 Generate Report
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        💾 Export Data
+                    </button>
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        🔄 Refresh
+                    </button>
                 </div>
             </div>
 
-            <div class="grid-container">
-                <div class="card" style="grid-column: 1 / -1;">
-                    <div class="card-header">
-                        <div class="card-title">🚨 Priority Intelligence Feed</div>
-                        <div style="font-size: 0.8rem; color: #7f8c8d;">Real-time • AI-filtered • Threat assessment</div>
+            <!-- Alerts Section -->
+            <div id="alerts-section" class="content-section" style="display: none;">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>Active Priority Alerts</h3>
+                        <input type="text" class="search-box" placeholder="Search alerts..." id="alerts-search">
                     </div>
-                    <div class="timeline">
-                        <div class="timeline-item priority-high">
-                            <div class="timeline-time">14:23</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">🔴 BREAKING: Council Legal Service opinion on CH-EU framework</div>
-                                <div class="timeline-desc">Confidential legal assessment leaked - suggests major hurdles for institutional framework. Source: COREPER I insider</div>
-                            </div>
-                        </div>
-                        <div class="timeline-item priority-high">
-                            <div class="timeline-time">13:45</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">🔴 URGENT: COSI emergency session called</div>
-                                <div class="timeline-desc">Migration pact implementation crisis - Switzerland's Schengen status may be discussed. Meeting tomorrow 08:00</div>
-                            </div>
-                        </div>
-                        <div class="timeline-item priority-medium">
-                            <div class="timeline-time">12:30</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">🟡 DG FISMA preparing equivalence review</div>
-                                <div class="timeline-desc">Swiss financial services equivalence under scrutiny. Internal memo suggests stricter requirements</div>
-                            </div>
-                        </div>
-                        <div class="timeline-item priority-medium">
-                            <div class="timeline-time">11:15</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">🟡 Parliament INTA committee: Swiss trade discussion</div>
-                                <div class="timeline-desc">MEP Lange raised questions about Swiss compliance with state aid rules. Hearing scheduled next week</div>
-                            </div>
-                        </div>
-                        <div class="timeline-item priority-low">
-                            <div class="timeline-time">10:00</div>
-                            <div class="timeline-content">
-                                <div class="timeline-title">🔵 Commission Daily News: Research cooperation</div>
-                                <div class="timeline-desc">Positive mention of Swiss participation in Horizon Europe projects. Standard update</div>
-                            </div>
-                        </div>
+                    <div id="alerts-container">
+                        <p>Loading alerts...</p>
                     </div>
                 </div>
             </div>
 
-            <div class="live-feed">
-                <div class="card-header">
-                    <div class="card-title">🔴 Live Intelligence Stream</div>
-                    <div style="font-size: 0.8rem; color: #7f8c8d;">AI-powered • Multi-source fusion • 24/7 monitoring</div>
-                </div>
-                
-                <div class="feed-item">
-                    <div class="pulse"></div>
-                    <div>
-                        <strong>SIGINT:</strong> Encrypted communication spike between COM and Council Legal Service
+            <!-- Data Section -->
+            <div id="data-section" class="content-section" style="display: none;">
+                <div class="table-section">
+                    <div class="table-header">
+                        <h3>All Monitoring Data</h3>
+                        <input type="text" class="search-box" placeholder="Search all data..." id="data-search">
                     </div>
-                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">Just now</div>
-                </div>
-                
-                <div class="feed-item">
-                    <div class="pulse"></div>
-                    <div>
-                        <strong>OSINT:</strong> German MEP Weber tweeted about "third country partnerships"
+                    <div id="data-container">
+                        <p>Loading data...</p>
                     </div>
-                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">2 min ago</div>
-                </div>
-                
-                <div class="feed-item">
-                    <div class="pulse"></div>
-                    <div>
-                        <strong>HUMINT:</strong> French Permanent Representation source confirms bilateral meeting tomorrow
-                    </div>
-                    <div style="margin-left: auto; font-size: 0.8rem; color: #7f8c8d;">5 min ago</div>
-                </div>
-
-                <div class="quick-actions">
-                    <button class="action-btn">🚀 Generate Flash Report</button>
-                    <button class="action-btn">📞 Alert Bern</button>
-                    <button class="action-btn">📧 Brief Ambassador</button>
-                    <button class="action-btn">🔍 Deep Analysis</button>
                 </div>
             </div>
-        </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section" style="display: none;">
+                <div class="timeline-section">
+                    <h3>Analytics Dashboard</h3>
+                    <p>Analytics visualization will be implemented here.</p>
+                    <canvas id="analytics-chart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section" style="display: none;">
+                <div class="settings-panel" style="display: block;">
+                    <h3>Configuration Settings</h3>
+                    <p style="margin-bottom: 1.5rem; color: #64748b;">Connect your Google Sheet to display real monitoring data.</p>
+                    
+                    <div class="settings-group">
+                        <label>Google Sheet ID</label>
+                        <input type="text" id="sheet-id" placeholder="Enter your Google Sheet ID">
+                        <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
+                            Find this in your Google Sheet URL: docs.google.com/spreadsheets/d/<strong>[SHEET-ID]</strong>/edit
+                        </p>
+                    </div>
+                    <div class="settings-group">
+                        <label>API Key (for Google Sheets API)</label>
+                        <input type="password" id="api-key" placeholder="Enter your API key">
+                        <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.5rem;">
+                            Get this from Google Cloud Console after enabling Sheets API
+                        </p>
+                    </div>
+                    <div class="settings-group">
+                        <label>Keywords to Monitor</label>
+                        <textarea id="keywords" placeholder="Enter keywords, one per line">switzerland
+schengen
+dublin
+ixim
+cats
+cosi
+prüm
+sis
+eurodac
+europol
+frontex</textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+                    
+                    <div style="margin-top: 2rem; padding: 1rem; background-color: #f1f5f9; border-radius: 0.375rem;">
+                        <h4 style="margin-bottom: 0.5rem;">Need help connecting?</h4>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">1. Open your Google Sheet</p>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">2. Copy the ID from the URL</p>
+                        <p style="font-size: 0.875rem; margin-bottom: 0.5rem;">3. Make sure the sheet is set to "Anyone with link can view"</p>
+                        <p style="font-size: 0.875rem;">4. Enable Google Sheets API and get an API key</p>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
-        // Add some interactive elements
+        // Configuration
+        const CONFIG = {
+            sheetId: localStorage.getItem('sheetId') || '',
+            apiKey: localStorage.getItem('apiKey') || '',
+            sheetName: 'EU_Security_Monitoring'
+        };
+
+        // Sample data for testing (replace with real Google Sheets data)
+        const SAMPLE_DATA = [
+            {
+                timestamp: new Date().toISOString(),
+                priority: 'HIGH',
+                source: 'EU Council',
+                title: 'Switzerland to enhance Schengen cooperation on border security',
+                description: 'New measures discussed at JHA Council meeting regarding data sharing.',
+                keywords: ['switzerland', 'schengen', 'border security'],
+                link: '#'
+            },
+            {
+                timestamp: new Date(Date.now() - 3600000).toISOString(),
+                priority: 'MEDIUM',
+                source: 'European Commission',
+                title: 'IXIM working group reviews Swiss participation in SIS II',
+                description: 'Technical discussions on system interoperability.',
+                keywords: ['ixim', 'sis ii', 'switzerland'],
+                link: '#'
+            },
+            {
+                timestamp: new Date(Date.now() - 7200000).toISOString(),
+                priority: 'LOW',
+                source: 'EUR-Lex',
+                title: 'Annual report on Schengen evaluation published',
+                description: 'Includes section on associated countries compliance.',
+                keywords: ['schengen', 'evaluation'],
+                link: '#'
+            }
+        ];
+
+        // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // Simulate real-time updates
-            setInterval(function() {
-                const pulses = document.querySelectorAll('.pulse');
-                pulses.forEach(pulse => {
-                    pulse.style.animation = 'none';
-                    setTimeout(() => {
-                        pulse.style.animation = 'pulse 2s infinite';
-                    }, 10);
-                });
-            }, 3000);
-
-            // Add click handlers
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Simulate metric updates
-            setInterval(function() {
-                const metrics = document.querySelectorAll('.metric');
-                metrics.forEach(metric => {
-                    if (Math.random() > 0.8) {
-                        const currentValue = parseInt(metric.textContent);
-                        const change = Math.floor(Math.random() * 3) - 1;
-                        metric.textContent = Math.max(0, currentValue + change);
-                    }
-                });
-            }, 5000);
+            loadDashboard();
+            setInterval(updateLastUpdate, 60000); // Update every minute
         });
+
+        // Navigation
+        function showSection(section, element) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            
+            // Show selected section
+            document.getElementById(section + '-section').style.display = 'block';
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            // Update title
+            const titles = {
+                'overview': 'Overview',
+                'alerts': 'Priority Alerts',
+                'data': 'All Data',
+                'analytics': 'Analytics',
+                'settings': 'Settings'
+            };
+            document.getElementById('section-title').textContent = titles[section];
+            
+            // Prevent default link behavior
+            return false;
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                // For now, use sample data. In production, this would fetch from Google Sheets
+                const data = SAMPLE_DATA;
+                
+                // Update metrics
+                updateMetrics(data);
+                
+                // Load timeline
+                loadTimeline(data);
+                
+                // Update last update time
+                updateLastUpdate();
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Update metrics
+        function updateMetrics(data) {
+            const today = new Date().toDateString();
+            const todayData = data.filter(item => new Date(item.timestamp).toDateString() === today);
+            
+            document.getElementById('total-mentions').textContent = todayData.length;
+            document.getElementById('high-priority').textContent = data.filter(item => item.priority === 'HIGH').length;
+            
+            // Count working group mentions
+            const workingGroups = ['ixim', 'cats', 'cosi', 'copen', 'scifa'];
+            const wgCount = data.filter(item => 
+                item.keywords.some(k => workingGroups.includes(k.toLowerCase()))
+            ).length;
+            document.getElementById('working-groups').textContent = wgCount;
+        }
+
+        // Load timeline
+        function loadTimeline(data) {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+            
+            data.forEach(item => {
+                const timelineItem = createTimelineItem(item);
+                container.appendChild(timelineItem);
+            });
+        }
+
+        // Create timeline item
+        function createTimelineItem(item) {
+            const div = document.createElement('div');
+            div.className = `timeline-item ${item.priority.toLowerCase()}-priority`;
+            
+            const time = new Date(item.timestamp).toLocaleString();
+            
+            div.innerHTML = `
+                <div class="timeline-dot"></div>
+                <div class="timeline-time">${time}</div>
+                <div class="timeline-title">${item.title}</div>
+                <div class="timeline-description">${item.description}</div>
+                <div class="timeline-keywords">
+                    ${item.keywords.map(k => `<span class="keyword-tag">${k}</span>`).join('')}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Filter timeline
+        function filterTimeline(priority) {
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Filter items
+            const items = document.querySelectorAll('.timeline-item');
+            items.forEach(item => {
+                if (priority === 'all' || item.classList.contains(priority + '-priority')) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Update last update time
+        function updateLastUpdate() {
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('last-update').textContent = `Last update: ${now}`;
+        }
+
+        // Generate report
+        function generateReport() {
+            alert('Report generation would create a PDF with current data analysis');
+        }
+
+        // Export data
+        function exportData() {
+            alert('Data export would download CSV file with all monitoring data');
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadDashboard();
+            alert('Data refreshed!');
+        }
+
+        // Save settings
+        function saveSettings() {
+            const sheetId = document.getElementById('sheet-id').value;
+            const apiKey = document.getElementById('api-key').value;
+            
+            if (sheetId && apiKey) {
+                localStorage.setItem('sheetId', sheetId);
+                localStorage.setItem('apiKey', apiKey);
+                CONFIG.sheetId = sheetId;
+                CONFIG.apiKey = apiKey;
+                alert('Settings saved! Dashboard will now connect to your Google Sheet.');
+                loadDashboard();
+            } else {
+                alert('Please enter both Sheet ID and API Key');
+            }
+        }
+
+        // Google Sheets Integration (to be implemented)
+        async function fetchGoogleSheetsData() {
+            if (!CONFIG.sheetId || !CONFIG.apiKey) {
+                console.log('Using sample data - configure Google Sheets in settings');
+                return SAMPLE_DATA;
+            }
+            
+            // This would fetch real data from Google Sheets
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${CONFIG.sheetName}?key=${CONFIG.apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                // Transform Google Sheets data to dashboard format
+                return transformSheetsData(data);
+            } catch (error) {
+                console.error('Error fetching Google Sheets data:', error);
+                return SAMPLE_DATA;
+            }
+        }
+
+        function transformSheetsData(sheetsData) {
+            // Transform Google Sheets data to dashboard format
+            // This would parse the rows and create proper objects
+            return SAMPLE_DATA; // Placeholder
+        }
     </script>
 </body>
 </html>
