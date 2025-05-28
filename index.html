@@ -706,8 +706,8 @@ frontex</textarea>
         // Load dashboard data
         async function loadDashboard() {
             try {
-                // For now, use sample data. In production, this would fetch from Google Sheets
-                const data = SAMPLE_DATA;
+                // Try to fetch real data from Google Sheets
+                const data = await fetchGoogleSheetsData();
                 
                 // Update metrics
                 updateMetrics(data);
@@ -720,6 +720,14 @@ frontex</textarea>
                 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
+                // Show error message
+                const container = document.getElementById('timeline-container');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #ef4444;">
+                        <p>Error loading data. Please check your settings.</p>
+                        <p style="font-size: 0.875rem; margin-top: 0.5rem;">${error.message}</p>
+                    </div>
+                `;
             }
         }
 
@@ -826,31 +834,70 @@ frontex</textarea>
             }
         }
 
-        // Google Sheets Integration (to be implemented)
+        // Google Sheets Integration
         async function fetchGoogleSheetsData() {
-            if (!CONFIG.sheetId || !CONFIG.apiKey) {
-                console.log('Using sample data - configure Google Sheets in settings');
+            const sheetId = localStorage.getItem('sheetId');
+            const apiKey = localStorage.getItem('apiKey');
+            
+            if (!sheetId || !apiKey) {
+                console.log('No Google Sheets configuration found. Using sample data.');
                 return SAMPLE_DATA;
             }
             
-            // This would fetch real data from Google Sheets
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.sheetId}/values/${CONFIG.sheetName}?key=${CONFIG.apiKey}`;
+            console.log('Fetching data from Google Sheets...');
+            
+            // Use the correct sheet name from your Apps Script
+            const sheetName = 'EU_Security_Monitoring';
+            const range = `${sheetName}!A:K`; // Columns A through K
+            
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
             
             try {
                 const response = await fetch(url);
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(`Google Sheets API error: ${error.error.message}`);
+                }
+                
                 const data = await response.json();
+                
+                if (!data.values || data.values.length < 2) {
+                    console.log('No data found in sheet');
+                    return [];
+                }
+                
                 // Transform Google Sheets data to dashboard format
                 return transformSheetsData(data);
             } catch (error) {
                 console.error('Error fetching Google Sheets data:', error);
-                return SAMPLE_DATA;
+                throw error;
             }
         }
 
         function transformSheetsData(sheetsData) {
-            // Transform Google Sheets data to dashboard format
-            // This would parse the rows and create proper objects
-            return SAMPLE_DATA; // Placeholder
+            const headers = sheetsData.values[0];
+            const rows = sheetsData.values.slice(1); // Skip header row
+            
+            console.log(`Found ${rows.length} rows of data`);
+            
+            return rows.map(row => {
+                // Map based on your Google Sheets columns:
+                // [Timestamp, Priority, Source, Title, Description, Link, Keywords, AI Summary, Implications, Actions, PubDate]
+                return {
+                    timestamp: row[0] || new Date().toISOString(),
+                    priority: row[1] || 'MEDIUM',
+                    source: row[2] || 'Unknown',
+                    title: row[3] || 'No title',
+                    description: row[4] || '',
+                    link: row[5] || '#',
+                    keywords: row[6] ? row[6].split(', ') : [],
+                    aiSummary: row[7] || '',
+                    swissImplications: row[8] || '',
+                    recommendedActions: row[9] || '',
+                    pubDate: row[10] || row[0] || new Date().toISOString()
+                };
+            }).filter(item => item.title !== 'No title'); // Filter out empty rows
         }
     </script>
 </body>
